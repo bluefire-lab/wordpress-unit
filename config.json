@@ -1,0 +1,43 @@
+{
+  "listeners": {
+    "*:80": {
+      "pass": "routes"
+    }
+  },
+
+  "routes": [
+    {
+      "match": {
+        "uri": ["*.php", "*.php/*", "/wp-admin/"]
+      },
+
+      "action": {
+        "pass": "applications/wordpress/direct"
+      }
+    },
+    {
+      "action": {
+        "share": "/opt/wordpress$uri",
+        "fallback": {
+          "pass": "applications/wordpress/index"
+        }
+      }
+    }
+  ],
+
+  "applications": {
+    "wordpress": {
+      "type": "php",
+      "targets": {
+        "direct": {
+          "root": "/opt/wordpress/"
+        },
+
+        "index": {
+          "root": "/opt/wordpress/",
+          "script": "index.php"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,28 @@
+version: "3.3"
+services:
+
+  wordpress:
+    build:
+      context: .
+    container_name: wordpress
+    ports:
+      - 8080:80
+    environment:
+      - WORDPRESS_DB_HOST=mysql
+      - WORDPRESS_DB_NAME=bluefire
+      - WORDPRESS_DB_USER=bluefire
+      - WORDPRESS_DB_PASSWORD=bluefire
+      - WORDPRESS_SITE_URL=http://localhost:8080
+
+  mysql:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bluefire
+      MYSQL_USER: bluefire
+      MYSQL_PASSWORD: bluefire
+    ports:
+      - 3306:3306
+    volumes:
+      - ./mysql:/var/lib/mysql

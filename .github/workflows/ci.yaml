@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+
+env:
+  REGISTRY: "ghcr.io/bluefire-lab"
+  IMAGE_NAME: "wordpress-unit"
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Slack Notification Job Started
+        if: ${{ env.SLACK_WEBHOOK != '' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: ${{ env.SLACK_CHANNEL }}
+          SLACK_COLOR: warning
+          SLACK_MESSAGE: "Release started"
+          SLACK_TITLE: Release on ${{ github.ref }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Checkout the repo
+        uses: actions/checkout@v3.5.3
+
+      - name: Set outputs
+        id: vars
+        shell: bash
+        run: |
+          PLAIN_TAG=$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA::7})
+          LATEST=$(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
+          SHA_TAG=$(echo $REGISTRY)/$(echo $IMAGE_NAME):$PLAIN_TAG
+          echo '::echo::on'
+          echo "::set-output name=sha_tag::$SHA_TAG"
+          echo "::set-output name=plain_tag::$PLAIN_TAG"
+          echo "::set-output name=image_tags::$LATEST,$SHA_TAG"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2.9.1
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v4.1.1
+        with:
+          file: Dockerfile
+          context: .
+          push: true
+          tags: ${{ steps.vars.outputs.sha_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Slack Notification Failure
+        if: ${{ failure() && env.SLACK_WEBHOOK != '' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: ${{ env.SLACK_CHANNEL }}
+          SLACK_COLOR: danger
+          SLACK_MESSAGE: "Release failed"
+          SLACK_TITLE: Release on ${{ github.ref }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Slack Notification Success
+        if: ${{ success() && env.SLACK_WEBHOOK != '' }}
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_CHANNEL: ${{ env.SLACK_CHANNEL }}
+          SLACK_COLOR: good
+          SLACK_MESSAGE: "Release ended successfully"
+          SLACK_TITLE: Release on ${{ github.ref }}
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
