@@ -38,6 +38,8 @@ RUN chmod 755 /bin/wp
 
 RUN mkdir -p /opt/
 
+WORKDIR /opt/
+
 RUN set -eux; \
 	version='6.3'; \
 	sha1='5ae2e02020004f7a848fc4015d309a0479f7c261'; \
@@ -61,4 +63,6 @@ RUN set -eux; \
 	chmod -R 1777 wp-content
 
 COPY --chown=unit:unit wp-config-docker.php /opt/wordpress/wp-config.php
-COPY ./*.json /docker-entrypoint.d/
+COPY --chown=unit:unit ./entrypoint/* /docker-entrypoint.d/
+
+RUN chmod +x /docker-entrypoint.d/*

@@ -103,13 +103,6 @@ if( !empty(getenv_docker('WORDPRESS_SITE_URL', '')) )
 	define( 'WP_SITEURL', getenv_docker('WORDPRESS_SITE_URL', ''));
 }
 
-# BEGIN WP Hide & Security Enhancer
-define( 'WPH_WPCONFIG_LOADER', true);
-$wphclassphp = ( defined('WP_PLUGIN_DIR')    ?     WP_PLUGIN_DIR   .   '/wp-hide-security-enhancer-pro/'    :      ( defined( 'WP_CONTENT_DIR') ? WP_CONTENT_DIR  :   dirname(__FILE__) . '/' . 'wp-content' )  . '/plugins/wp-hide-security-enhancer-pro' ) . '/include/wph.class.php'; 
-if(file_exists($wphclassphp)) include_once($wphclassphp);
-if (class_exists('WPH')) { global $wph; $wph    =   new WPH(); ob_start( array($wph, 'ob_start_callback')); }
-# END WP Hide & Security Enhancer
-
 /**#@-*/
 
 /**
