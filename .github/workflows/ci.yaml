@@ -29,8 +29,11 @@ jobs:
         id: vars
         shell: bash
         run: |
-          LATEST=${{ steps.login-ecr.outputs.registry }}/${{ inputs.repository-name }}:latest
-          SHA_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.repository-name }}:$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA::7})
+          PLAIN_TAG=$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA::7})
+          LATEST=$(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
+          SHA_TAG=$(echo $REGISTRY)/$(echo $IMAGE_NAME):$PLAIN_TAG
+          echo 'SHA_TAG=$SHA_TAG' >> $GITHUB_ENV
+          echo 'PLAIN_TAG=$PLAIN_TAG' >> $GITHUB_ENV
           echo 'IMAGE_TAGS=$LATEST,$SHA_TAG' >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
