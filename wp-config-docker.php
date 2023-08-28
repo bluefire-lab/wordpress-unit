@@ -90,7 +90,7 @@ define( 'NONCE_SALT',       getenv_docker('WORDPRESS_NONCE_SALT',       'put you
 
 // Disable auto-update. 
 // Auto-update would be lost when a new instance starts
-define( 'WP_AUTO_UPDATE_CORE', false );
+define( 'WP_AUTO_UPDATE_CORE', !!getenv_docker('WP_AUTO_UPDATE_CORE', false) );
 // define( 'DISALLOW_FILE_EDIT', true );
 // define( 'DISALLOW_FILE_MODS', true );
 
@@ -132,7 +132,7 @@ define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 // see also https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
 if ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)
-	|| !!getenv_docker('WORDPRESS_HTTPS', '')) {
+	|| !!getenv_docker('WORDPRESS_FORCE_HTTPS', '')) {
 	$_SERVER['HTTPS'] = 'on';
 }
 
