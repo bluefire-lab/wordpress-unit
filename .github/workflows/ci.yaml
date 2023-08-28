@@ -29,13 +29,9 @@ jobs:
         id: vars
         shell: bash
         run: |
-          PLAIN_TAG=$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA::7})
-          LATEST=$(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
-          SHA_TAG=$(echo $REGISTRY)/$(echo $IMAGE_NAME):$PLAIN_TAG
-          echo '::echo::on'
-          echo "::set-output name=sha_tag::$SHA_TAG"
-          echo "::set-output name=plain_tag::$PLAIN_TAG"
-          echo "::set-output name=image_tags::$LATEST,$SHA_TAG"
+          LATEST=${{ steps.login-ecr.outputs.registry }}/${{ inputs.repository-name }}:latest
+          SHA_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.repository-name }}:$(echo ${GITHUB_REF##*/})-$(echo ${GITHUB_SHA::7})
+          echo 'IMAGE_TAGS=$LATEST,$SHA_TAG' >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2.9.1
@@ -53,7 +49,7 @@ jobs:
           file: Dockerfile
           context: .
           push: true
-          tags: ${{ steps.vars.outputs.sha_tag }}
+          tags: ${{ env.IMAGE_TAGS }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64
@@ -77,3 +73,13 @@ jobs:
           SLACK_MESSAGE: "Release ended successfully"
           SLACK_TITLE: Release on ${{ github.ref }}
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Update summary
+        shell: bash
+        run: |
+          echo "" >> $GITHUB_STEP_SUMMARY # this is a blank line
+          echo "Image built succesfuly 🚀🚀" >> $GITHUB_STEP_SUMMARY
+          echo "- Tags: " >> $GITHUB_STEP_SUMMARY
+          echo "${{ env.IMAGE_TAGS }}" | tr "," "\n  - " >> $GITHUB_STEP_SUMMARY        
+          
+    

@@ -131,11 +131,10 @@ define( 'WP_DEBUG', !!getenv_docker('WORDPRESS_DEBUG', '') );
 
 // If we're behind a proxy server and using HTTPS, we need to alert WordPress of that fact
 // see also https://wordpress.org/support/article/administration-over-ssl/#using-a-reverse-proxy
-// if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {
-// 	$_SERVER['HTTPS'] = 'on';
-// }
-// In LAMASON infra SSL is allways on. We force it to prevent 301 from health checkers
-//$_SERVER['HTTPS'] = 'on';
+if ((isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strpos($_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false)
+	|| !!getenv_docker('WORDPRESS_HTTPS', '')) {
+	$_SERVER['HTTPS'] = 'on';
+}
 
 // (we include this by default because reverse proxying is extremely common in container environments)
 
