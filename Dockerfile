@@ -2,6 +2,12 @@ FROM unit:1.30.0-php8.2
 
 ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
 
+RUN set -ex \
+    && apt-get update \
+    && apt-get install --no-install-recommends --no-install-suggests -y gettext vim curl \
+    && apt-get purge -y --auto-remove \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN chmod +x /usr/local/bin/install-php-extensions && \
     install-php-extensions igbinary \
       gd \
@@ -64,5 +70,6 @@ RUN set -eux; \
 
 COPY --chown=unit:unit wp-config-docker.php /opt/wordpress/wp-config.php
 COPY --chown=unit:unit ./entrypoint/* /docker-entrypoint.d/
+COPY --chown=root:root ./php.tmpl.ini /var/data/default-php.tmpl.ini
 
 RUN chmod +x /docker-entrypoint.d/*
