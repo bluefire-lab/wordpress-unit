@@ -4,7 +4,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -y gettext vim curl \
+    && apt-get install --no-install-recommends --no-install-suggests -y gettext vim curl zip mariadb-client \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
