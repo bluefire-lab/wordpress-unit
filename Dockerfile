@@ -4,7 +4,7 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 
 RUN set -ex \
     && apt-get update \
-    && apt-get install --no-install-recommends --no-install-suggests -y gettext vim curl zip mariadb-client \
+    && apt-get install --no-install-recommends --no-install-suggests -y gettext vim curl zip mariadb-client less \
     && apt-get purge -y --auto-remove \
     && rm -rf /var/lib/apt/lists/*
 
@@ -47,8 +47,8 @@ RUN mkdir -p /opt/
 WORKDIR /opt/
 
 RUN set -eux; \
-	version='6.3'; \
-	sha1='5ae2e02020004f7a848fc4015d309a0479f7c261'; \
+	version='6.4.5'; \
+	sha1='11ded5383661ea23b82ddc1b8757a4586f1a4264'; \
 	\
 	curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
 	echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
