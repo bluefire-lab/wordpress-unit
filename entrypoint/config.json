@@ -1,4 +1,17 @@
 {
+  "access_log": {
+    "path": "/var/log/unit.log",
+    "format": {
+      "remote_addr": "$remote_addr",
+      "time_local": "$time_local",
+      "request_line": "$request_line",
+      "status": "$status",
+      "body_bytes_sent": "$body_bytes_sent",
+      "header_referer": "$header_referer",
+      "header_user_agent": "$header_user_agent"
+    }
+  },
+
   "listeners": {
     "*:9090": {
       "pass": "routes"
@@ -28,6 +41,13 @@
   "applications": {
     "wordpress": {
       "type": "php",
+      "user": "wpuser",
+      "group": "wpgroup",
+      "processes": {
+        "max": 10,
+        "spare": 5,
+        "idle_timeout": 20
+      },
       "targets": {
         "direct": {
           "root": "/opt/wordpress/"

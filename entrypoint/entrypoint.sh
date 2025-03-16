@@ -1,8 +1,8 @@
 #!/bin/bash
 
 WP_FOLDER="/opt/wordpress"
-GROUP="unit"
-USER="unit"
+GROUP="wpgroup"
+USER="wpuser"
 
 # Once the wp-content folder is mounted as a volume, check if it's empty
 if [ "$(ls -A $WP_FOLDER/wp-content)" ]; then

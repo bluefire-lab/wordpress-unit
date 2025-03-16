@@ -90,7 +90,7 @@ define( 'NONCE_SALT',       getenv_docker('WORDPRESS_NONCE_SALT',       'put you
 
 // Disable auto-update. 
 // Auto-update would be lost when a new instance starts
-define( 'WP_AUTO_UPDATE_CORE', !!getenv_docker('WP_AUTO_UPDATE_CORE', false) );
+define( 'WP_AUTO_UPDATE_CORE', !!getenv_docker('WP_AUTO_UPDATE_CORE', true) );
 // define( 'DISALLOW_FILE_EDIT', true );
 // define( 'DISALLOW_FILE_MODS', true );
 
