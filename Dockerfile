@@ -45,7 +45,7 @@ RUN install-php-extensions @composer
 RUN curl -o /bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
 RUN chmod 755 /bin/wp
 
-RUN mkdir -p /opt/
+RUN mkdir -p /opt/tools
 
 WORKDIR /opt/
 
@@ -59,23 +59,19 @@ RUN set -eux; \
   curl -o wordpress.tar.gz -fL "https://wordpress.org/wordpress-$version.tar.gz"; \
   echo "$sha1 *wordpress.tar.gz" | sha1sum -c -; \
   \
-  # upstream tarballs include ./wordpress/ so this gives us /usr/src/wordpress
-  tar -xzf wordpress.tar.gz -C /opt/; \
+  tar -xzf wordpress.tar.gz -C /opt/tools/; \
   rm wordpress.tar.gz; \
-  \
-  chown -R ${USER}:${GROUP} /opt/wordpress; \
-  # pre-create wp-content (and single-level children) for folks who want to bind-mount themes, etc so permissions are pre-created properly instead of root:root
-  # wp-content/cache: https://github.com/docker-library/wordpress/issues/534#issuecomment-705733507
-  mkdir wp-content; \
-  for dir in /opt/wordpress/wp-content/*/ cache; do \
-  dir="$(basename "${dir%/}")"; \
-  mkdir "wp-content/$dir"; \
-  done; \
-  chown -R ${USER}:${GROUP} wp-content; \
-  chmod -R 1755 wp-content
+  chown -R ${USER}:${GROUP} /opt/tools/wordpress;
 
-COPY --chown=${USER}:${GROUP} wp-config-docker.php /opt/wordpress/wp-config.php
-COPY --chown=unit:unit ./entrypoint/* /docker-entrypoint.d/
+COPY --chown=${USER}:${GROUP} wp-config-docker.php /opt/tools/wordpress/wp-config.php
+COPY --chown=root:root ./entrypoint/* /docker-entrypoint.d/
 COPY --chown=root:root ./php.tmpl.ini /var/data/default-php.tmpl.ini
+COPY --chown=root:root ./wordpress-entrypoint.sh /usr/local/bin/wordpress-entrypoint.sh
+
+WORKDIR /opt/wordpress
 
 RUN chmod +x /docker-entrypoint.d/*
+RUN chmod +x /usr/local/bin/wordpress-entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/wordpress-entrypoint.sh"]
+CMD ["unitd", "--no-daemon", "--control", "unix:/var/run/control.unit.sock"]
