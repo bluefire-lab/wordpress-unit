@@ -44,9 +44,9 @@
       "user": "wpuser",
       "group": "wpgroup",
       "processes": {
-        "max": 10,
-        "spare": 5,
-        "idle_timeout": 20
+        "max": 4,
+        "spare": 2,
+        "idle_timeout": 5
       },
       "targets": {
         "direct": {
